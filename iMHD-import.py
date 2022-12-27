@@ -6,7 +6,7 @@ from xml.etree.ElementTree import ElementTree, Element
 # 3rd-party imports
 import bpy
 # local imports
-from iMovieProj import iMovieProj
+from iMovieProj import iMovieProj, XMLDict
 
 X_RESOLUTION = 640
 Y_RESOLUTION = 480
@@ -16,5 +16,5 @@ path_of_proj_file = BASE_FILEPATH / Path("Outdoor_Movie/outdoor_movie_edit.iMovi
 path_of_clips = BASE_FILEPATH / Path("Outdoor_Movie/")
 
 xmltree : ElementTree    = ET.parse(path_of_proj_file)
-xmldict : Dict[str, Any] = iMovieProj.XMLTreeToDict(xmltree)
+xmldict : Dict[str, Any] = XMLDict.XMLTreeToDict(xmltree)
 project : iMovieProj     = iMovieProj(xmldict=xmldict)
