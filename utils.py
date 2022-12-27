@@ -61,23 +61,18 @@ class VideoClip:
 
     @property
     def Duration(self):
-        """Method to check the clip's file name"""
         return self._duration
     @property
     def FileName(self):
-        """Method to check the clip's file name"""
         return self._fileName
     @property
     def SceneName(self):
-        """Method to check the clip's scene name"""
         return self._sceneName
     @property
     def InFrame(self):
-        """Method to check the clip's file name"""
         return self._inFrame
     @property
     def OutFrame(self):
-        """Method to check the clip's scene name"""
         return self._outFrame
     @property
     def InEdit(self):
