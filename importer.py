@@ -49,6 +49,31 @@ class XMLDict:
 
         return ret_val
 
+class AudioClip:
+    """Tracking of audio clip properties"""
+    def __init__(self):
+        self._duration = 0
+        self._fileName = "empty"
+        self._sceneName = "empty"
+        self._inFrame = 0
+        self._outFrame = 0
+        self._partOfEdit = 0
+
+    @property
+    def Duration(self):
+        return self._duration
+    @property
+    def FileName(self):
+        return self._fileName
+    @property
+    def SceneName(self):
+        return self._sceneName
+    @property
+    def InFrame(self):
+        return self._inFrame
+    @property
+    def OutFrame(self):
+        return self._outFrame
 class VideoClip:
     """Tracking of video clip properties"""
     def __init__(self):
