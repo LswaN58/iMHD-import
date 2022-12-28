@@ -3,6 +3,10 @@ from typing import Any, Dict, Optional
 from xml.etree.ElementTree import ElementTree, Element
 
 class XMLDict:
+    """
+    Class to take an XML ElementTree from iMovieProj file and turn it into a dictionary-like format.
+    """
+
     @staticmethod
     def XMLTreeToDict(xmltree:ElementTree):
         root = xmltree.getroot()
@@ -119,10 +123,10 @@ class iMovieProj:
     def __init__(self, xmldict:Dict[str, Any]):
         nested_keys = ["audioClips", "audioTrashClips", "videoClips", "videoTrashClips"]
         self._other_elements = {key:xmldict[key] for key in xmldict.keys() if key not in nested_keys}
-        self._audioClips      = self._getAudioClips(xmltree)
-        self._audioTrashClips = self._getAudioTrashClips(xmltree)
-        self._videoClips      = self._getVideoClips(xmltree)
-        self._videoTrashClips = self._getVideoTrashClips(xmltree)
+        self._audioClips      = [AudioClip(aclip) for aclip in xmldict.get("audioClips")]
+        self._audioTrashClips = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips")]
+        self._videoClips      = [VideoClip(vclip) for vclip in xmldict.get("videoClips")]
+        self._videoTrashClips = [VideoClip(vclip) for vclip in xmldict.get("videoClips")]
 
     @property
     def AudioClips(self):
@@ -169,8 +173,3 @@ class iMovieProj:
     @property
     def WritingApplicationVersion(self) -> Optional[str]:
         return self._other_elements.get("writingApplicationVersion")
-
-    def _getAudioClips(xmltree)
-    def _getAudioTrashClips(xmltree)
-    def _getVideoClips(xmltree)
-    def _getVideoTrashClips(xmltree)
