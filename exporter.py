@@ -1,4 +1,4 @@
-from import import VideoClip
+from importer import VideoClip
 
 class Blender:
     @staticmethod

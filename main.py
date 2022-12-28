@@ -6,7 +6,7 @@ from xml.etree.ElementTree import ElementTree, Element
 # 3rd-party imports
 import bpy
 # local imports
-from utils import iMovieProj, XMLDict
+from importer import iMovieProj, XMLDict
 
 X_RESOLUTION = 640
 Y_RESOLUTION = 480
