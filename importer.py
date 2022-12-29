@@ -1,5 +1,5 @@
 # builtin imports
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from xml.etree.ElementTree import ElementTree, Element
 
 class XMLDict:
@@ -48,6 +48,7 @@ class XMLDict:
             if xmldict[2*i].tag != "key":
                 raise ValueError(f"Expected the even keys under XML dict to be keys, found element {2*i} with tag {xmldict[2*i].tag}!")
             key = xmldict[2*i].text
+            print(f"In parseDict, about to parse value for key {key}")
             val = XMLDict._parse(xmldict[2*i + 1])
             ret_val[key] = val
 
@@ -174,6 +175,13 @@ class VideoClip:
         self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
 
     @property
+    def IsFiltered(self) -> bool:
+        return True
+    @property
+    def BaseFileName(self) -> Union[str, List[str]]:
+        return self.FileName
+
+    @property
     def Duration(self) -> int:
         return self._duration
     @property
@@ -246,6 +254,20 @@ class Transition(VideoClip):
         self._replaced_clips = [VideoClip(clip) for clip in clip_dict.get('replacedClips', [])]
 
     @property
+    def IsFiltered(self) -> bool:
+        return False
+    @property
+    def BaseFileName(self) -> Union[str, List[str]]:
+        ret_val = []
+        base_list = [clip.BaseFileName for clip in self.ReplacedClips]
+        for item in base_list:
+            if isinstance(item, str):
+                ret_val.append(item)
+            elif isinstance(item, list):
+                ret_val += item
+        return ret_val
+
+    @property
     def FramesTakenAfter(self) -> int:
         return self._framesAfter
     @property
@@ -261,7 +283,7 @@ class Transition(VideoClip):
     def PluginType(self) -> Optional[int]:
         return self._other_elements.get('pluginType')
     @property
-    def ReplacedClips(self) -> list:
+    def ReplacedClips(self) -> List[VideoClip]:
         return self._replaced_clips
     @property
     def TransitionDirection(self) -> Optional[int]:
@@ -283,6 +305,10 @@ class VFXClip(VideoClip):
         self._startFrame   = clip_dict['startFrame']
 
         self._filtered_clips = [VideoClip(clip) for clip in clip_dict.get('filteredClips', [])]
+
+    @property
+    def IsFiltered(self) -> bool:
+        return False
 
     @property
     def ClipEatenByFilter(self) -> Optional[bool]:
