@@ -1,0 +1,8 @@
+from pathlib import Path
+
+X_RESOLUTION = 640
+Y_RESOLUTION = 480
+BASE_PATH = Path("Path/to/base/project/folder")
+
+PROJ_PATH  = BASE_PATH / Path("relative/path/to/project.iMovieProj")
+CLIPS_PATH = BASE_PATH / Path("relative/path/to/videos/folder/")
