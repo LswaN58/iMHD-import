@@ -24,6 +24,8 @@ class XMLDict:
             return True
         elif xmlvalue.tag == "false":
             return False
+        elif xmlvalue.tag == "array":
+            return [XMLDict._parse(elem) for elem in xmlvalue]
         else:
             if xmlvalue.text is None:
                 raise ValueError(f"Expected XML Element with tag {xmlvalue.tag} to have a value, but found a value of None!")
@@ -33,8 +35,6 @@ class XMLDict:
                 return int(xmlvalue.text)
             elif xmlvalue.tag == "real":
                 return float(xmlvalue.text)
-            elif xmlvalue.tag == "array":
-                return [XMLDict._parse(elem) for elem in xmlvalue]
             elif xmlvalue.tag == "dict":
                 return XMLDict._parseDict(xmlvalue)
 
