@@ -38,6 +38,23 @@ General formatting hierarchy is as follows:
 - version : string
 - videoClips : []
   - video example:
+    - class : enum(transition, video)
+    - duration : int
+    - file : string, name of modified file rendered and put in timeline (if an effect)
+    - in : int
+    - isSelected : bool
+    - mediaHandlePost : int
+    - name : string
+    - out : int
+    - shelfX : int
+    - shelfY : int
+    - thumb : int
+    - timeScale : int
+    - track : int
+    - type : int
+    - uniqueID : int
+    - version : string
+  - video example with VFX:
     - class : enum(transition, video), video example below:
     - clipEatenByFilter : bool
     - duration : int
