@@ -157,8 +157,6 @@ class AudioClip:
 
 class VideoClip:
     """Tracking of video clip properties"""
-    # TODO: IsFiltered should figure out if we got a clip that had filter applied,
-    # and based on IsFiltered, we should retrieve original clip, not rendered filter clip.
     def __init__(self, clip_dict):
         if not clip_dict.get('class') == "video":
             raise ValueError(f"VideoClip constructor was given a dict of class {clip_dict.get('class')}!")
