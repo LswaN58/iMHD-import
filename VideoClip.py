@@ -103,6 +103,9 @@ class FilteredClip(VideoClip):
         self._framesBefore = clip_dict['framesTakenBefore']
         self._framesAfter  = clip_dict['framesTakenAfter']
 
+    def __repr__(self):
+        return f"FilteredClip object: Subclass of {super(FilteredClip, self).__repr__()}; Plugin {self.PluginName}"
+
     @property
     def IsFiltered(self) -> bool:
         return True
@@ -131,6 +134,9 @@ class Transition(FilteredClip):
         required = {"replacedClips"}
         super().__init__(clip_dict, sub_required=required)
         self._replaced_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('replacedClips', [])]
+
+    def __repr__(self):
+        return f"Transition object: subclass of {super(Transition, self).__repr__()}; {len(self.ReplacedClips)} replaced clip(s); Base file(s) of {self.BaseFileName}"
 
     @property
     def BaseFileName(self) -> Union[str, List[str]]:
@@ -162,7 +168,7 @@ class VFXClip(FilteredClip):
         self._filtered_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('filteredClips', [])]
 
     def __repr__(self) -> str:
-        return f"VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; Plugin {self.PluginName}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}"
+        return f"VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}"
 
     @property
     def FilterDepth(self) -> int:
