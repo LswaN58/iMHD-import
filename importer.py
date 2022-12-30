@@ -51,7 +51,7 @@ class XMLDict:
             if xmldict[2*i].tag != "key":
                 raise ValueError(f"Expected the even keys under XML dict to be keys, found element {2*i} with tag {xmldict[2*i].tag}!")
             key = xmldict[2*i].text
-            print(f"In parseDict, about to parse value for key {key}")
+            # print(f"In parseDict, about to parse value for key {key}")
             val = XMLDict._parse(xmldict[2*i + 1])
             ret_val[key] = val
 
