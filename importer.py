@@ -1,5 +1,5 @@
 # builtin imports
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional
 from xml.etree.ElementTree import ElementTree, Element
 # local imports
 from AudioClip import AudioClip
@@ -63,11 +63,11 @@ class iMovieProj:
 
     def __init__(self, xmldict:Dict[str, Any]):
         nested_keys = ["audioClips", "audioTrashClips", "videoClips", "videoTrashClips"]
-        self._other_elements = {key:xmldict[key] for key in xmldict.keys() if key not in nested_keys}
-        self._audioClips      = [AudioClip(aclip) for aclip in xmldict.get("audioClips", [])]
-        self._audioTrashClips = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips", [])]
-        self._videoClips      = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
-        self._videoTrashClips = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._other_elements  : Dict[str, Any]  = {key:xmldict[key] for key in xmldict.keys() if key not in nested_keys}
+        self._audioClips      : List[AudioClip] = [AudioClip(aclip) for aclip in xmldict.get("audioClips", [])]
+        self._audioTrashClips : List[AudioClip] = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips", [])]
+        self._videoClips      : List[VideoClip] = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._videoTrashClips : List[VideoClip] = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
 
     def __repr__(self) -> str:
         return f"iMovieProj object: {len(self.VideoClips)} video clips; {len(self.AudioClips)} audio clips; {self.VideoStandard} format"
