@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Set, Union
 from xml.etree.ElementTree import ElementTree, Element
 # local imports
 from AudioClip import AudioClip
-from VideoClip import VideoClip
+from VideoClip import VideoClip, VideoClipFactory
 
 class XMLDict:
     """
@@ -66,18 +66,11 @@ class iMovieProj:
         self._other_elements = {key:xmldict[key] for key in xmldict.keys() if key not in nested_keys}
         self._audioClips      = [AudioClip(aclip) for aclip in xmldict.get("audioClips", [])]
         self._audioTrashClips = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips", [])]
-        self._videoClips      = [VideoClip(vclip) for vclip in xmldict.get("videoClips", [])]
-        self._videoTrashClips = [VideoClip(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._videoClips      = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._videoTrashClips = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
 
     def __repr__(self) -> str:
         return f"iMovieProj object: {len(self.VideoClips)} video clips; {len(self.AudioClips)} audio clips; {self.VideoStandard} format"
-
-    @staticmethod
-    def _genVideoClip(vclip) -> VideoClip:
-        if vclip.get('clipEatenByFilter', False):
-            return VFXClip(vclip)
-        else:
-            return VideoClip(vclip)
 
     @property
     def AudioClips(self):
