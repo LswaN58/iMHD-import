@@ -50,6 +50,11 @@ class AudioClip:
         self._push_pins      = [AudioPushPin(pin) for pin in clip_dict.get('pushPins', [])]
         self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
 
+    def __repr__(self):
+        return f"<AudioClip object: name {self.Name}; file {self.FileName}; in {self.InFrame}; out {self.OutFrame}; start {self.StartFrame}>"
+    def __str__(self):
+        return self.__repr__()
+
     @property
     def Duration(self) -> int:
         return self._duration
