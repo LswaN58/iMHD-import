@@ -130,7 +130,7 @@ class Transition(FilteredClip):
     def __init__(self, clip_dict):
         required = {"replacedClips"}
         super().__init__(clip_dict, sub_required=required)
-        self._replaced_clips = [VideoClipFromDict(clip) for clip in clip_dict.get('replacedClips', [])]
+        self._replaced_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('replacedClips', [])]
 
     @property
     def BaseFileName(self) -> Union[str, List[str]]:
@@ -159,7 +159,7 @@ class VFXClip(FilteredClip):
         super().__init__(clip_dict, sub_required={"startFrame"})
         self._startFrame   = clip_dict['startFrame']
 
-        self._filtered_clips = [VideoClipFromDict(clip) for clip in clip_dict.get('filteredClips', [])]
+        self._filtered_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('filteredClips', [])]
 
     def __repr__(self) -> str:
         return f"VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; Plugin {self.PluginName}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}"
@@ -190,10 +190,12 @@ class VFXClip(FilteredClip):
     def SolidColorClipColor(self) -> Optional[List[int]]:
         return self._other_elements.get('solidColorClipColor')
 
-def VideoClipFromDict(clip_dict) -> VideoClip:
-    if clip_dict.get('class') == "transition":
-        return Transition(clip_dict=clip_dict)
-    elif clip_dict.get('clipEatenByFilter') is True:
-        return VFXClip(clip_dict=clip_dict)
-    else:
-        return VideoClip(clip_dict=clip_dict, sub_required=set())
+class VideoClipFactory:
+    @staticmethod
+    def FromDict(clip_dict) -> VideoClip:
+        if clip_dict.get('class') == "transition":
+            return Transition(clip_dict=clip_dict)
+        elif clip_dict.get('clipEatenByFilter') is True:
+            return VFXClip(clip_dict=clip_dict)
+        else:
+            return VideoClip(clip_dict=clip_dict, sub_required=set())
