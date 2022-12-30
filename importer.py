@@ -1,6 +1,9 @@
 # builtin imports
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 from xml.etree.ElementTree import ElementTree, Element
+# local imports
+from AudioClip import AudioClip
+from VideoClip import VideoClip
 
 class XMLDict:
     """
@@ -54,294 +57,6 @@ class XMLDict:
 
         return ret_val
 
-class AudioPushPin:
-    """Tracking of push-pin properties within a clip"""
-    def __init__(self, pin_dict:Dict[str, Any]):
-        required = {"audioFrame", "originalClipFrame", "videoFrame"}
-        if not set(pin_dict.keys()).issuperset(required):
-            raise ValueError(f"AudioPushPin is missing required elements {required.difference(set(pin_dict.keys()))}!")
-        self._audio_frame       = pin_dict['audioFrame']
-        self._originalClipFrame = pin_dict['originalClipFrame']
-        self._videoFrame        = pin_dict['videoFrame']
-        self._other_elements    = {pin:pin_dict[pin] for pin in pin_dict.keys() if pin not in required}
-
-    @property
-    def AudioFrame(self) -> int:
-        return self._audio_frame
-    @property
-    def ClipUID(self) -> Optional[int]:
-        return self._other_elements.get('clipUID')
-    @property
-    def OriginalClipFrame(self) -> int:
-        return self._originalClipFrame
-    @property
-    def OriginalClipUID(self) -> Optional[int]:
-        return self._other_elements.get('originalClipUID')
-    @property
-    def VideoFrame(self) -> int:
-        return self._videoFrame
-
-class AudioClip:
-    """Tracking of audio clip properties"""
-    def __init__(self, clip_dict:Dict[str, Any]):
-        if not clip_dict.get('class') == "audio":
-            raise ValueError(f"AudioClip constructor was given a dict of class {clip_dict.get('class')}!")
-        required = {"duration","file","name","in","out","startFrame","track","trimmedEndFrame","trimmedStartFrame"}
-        if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"AudioClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
-        self._duration     = clip_dict['duration']
-        self._fileName     = clip_dict['file']
-        self._name         = clip_dict['name']
-        self._inFrame      = clip_dict['in']
-        self._outFrame     = clip_dict['out']
-        self._startFrame   = clip_dict['startFrame']
-        self._track        = clip_dict['track']
-        self._trimmedStart = clip_dict['trimmedStartFrame']
-        self._trimmedEnd   = clip_dict['trimmedEndFrame']
-
-        self._filtered_list  = [AudioClip(clip) for clip in clip_dict.get('imaeFilteredList', [])]
-        self._push_pins      = [AudioPushPin(pin) for pin in clip_dict.get('pushPins', [])]
-        self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
-
-    @property
-    def Duration(self) -> int:
-        return self._duration
-    @property
-    def FileName(self) -> str:
-        return self._fileName
-    @property
-    def InFrame(self) -> int:
-        return self._inFrame
-    @property
-    def OutFrame(self) -> int:
-        return self._outFrame
-    @property
-    def Image4CC(self) -> Optional[int]:
-        return self._other_elements.get('imae4cc')
-    @property
-    def imagefilteredlist(self) -> list:
-        return self._filtered_list
-    @property
-    def ImageVersion(self) -> Optional[int]:
-        return self._other_elements.get('imaeVersion')
-    @property
-    def IsSelected(self) -> Optional[bool]:
-        return self._other_elements.get('isSelected')
-    @property
-    def Name(self) -> str:
-        return self._name
-    @property
-    def PushPins(self) -> List[AudioPushPin]:
-        return self._push_pins
-    @property
-    def StartFrame(self) -> int:
-        return self._startFrame
-    @property
-    def TimeScale(self) -> Optional[int]:
-        return self._other_elements.get('timeScale')
-    @property
-    def Track(self) -> int:
-        return self._track
-    @property
-    def TrimmedEndFrame(self) -> int:
-        return self._trimmedEnd
-    @property
-    def TrimmedStartFrame(self) -> int:
-        return self._trimmedStart
-    @property
-    def UniqueID(self) -> Optional[bool]:
-        return self._other_elements.get('uniqueID')
-    @property
-    def Version(self) -> Optional[str]:
-        return self._other_elements.get('version')
-
-class VideoClip:
-    """Tracking of video clip properties"""
-    def __init__(self, clip_dict):
-        if not clip_dict.get('class') == "video":
-            raise ValueError(f"VideoClip constructor was given a dict of class {clip_dict.get('class')}!")
-        required = {"duration","file","name","in","out","track"}
-        if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"VideoClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
-        self._duration     = clip_dict['duration']
-        self._fileName     = clip_dict['file']
-        self._name         = clip_dict['name']
-        self._inFrame      = clip_dict['in']
-        self._outFrame     = clip_dict['out']
-        self._track        = clip_dict['track']
-
-        self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
-
-    @property
-    def IsFiltered(self) -> bool:
-        return True
-    @property
-    def BaseFileName(self) -> Union[str, List[str]]:
-        return self.FileName
-
-    @property
-    def Duration(self) -> int:
-        return self._duration
-    @property
-    def FileName(self) -> str:
-        return self._fileName
-    @property
-    def InFrame(self) -> int:
-        return self._inFrame
-    @property
-    def OutFrame(self) -> int:
-        return self._outFrame
-    @property
-    def IsSelected(self) -> Optional[bool]:
-        return self._other_elements.get('isSelected')
-    @property
-    def MediaHandlePost(self) -> Optional[bool]:
-        return self._other_elements.get('mediaHandlePost')
-    @property
-    def Name(self) -> str:
-        return self._name
-    @property
-    def ShelfX(self) -> Optional[int]:
-        return self._other_elements.get('shelfX')
-    @property
-    def ShelfY(self) -> Optional[int]:
-        return self._other_elements.get('shelfY')
-    @property
-    def Thumb(self) -> Optional[int]:
-        return self._other_elements.get('thumb')
-    @property
-    def TimeScale(self) -> Optional[int]:
-        return self._other_elements.get('timeScale')
-    @property
-    def Track(self) -> int:
-        return self._track
-    @property
-    def Type(self) -> Optional[int]:
-        return self._other_elements.get('type')
-    @property
-    def UniqueID(self) -> Optional[bool]:
-        return self._other_elements.get('uniqueID')
-    @property
-    def Version(self) -> Optional[str]:
-        return self._other_elements.get('version')
-
-    @property
-    def InEdit(self):
-        """Method to check if the current clip is part of the edit."""
-        if self._track == 0:
-            return False
-        elif self._track == 1:
-            return True
-        else:
-            return False
-
-    def toString(self):
-        return "scene " + self._name + ", file " + self._fileName + ", in edit: " + str(self.InEdit)
-
-class Transition(VideoClip):
-    """Subclass of VideoClip to handle info about Transitions"""
-    def __init__(self, clip_dict):
-        required = {"duration","file","name","in","out","startFrame","track","framesTakenAfter","framesTakenBefore"}
-        if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"VideoClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
-        super().__init__(clip_dict)
-        self._framesBefore = clip_dict['framesTakenBefore']
-        self._framesAfter  = clip_dict['framesTakenAfter']
-        self._startFrame   = clip_dict['startFrame']
-
-        self._replaced_clips = [VideoClip(clip) for clip in clip_dict.get('replacedClips', [])]
-
-    @property
-    def IsFiltered(self) -> bool:
-        return False
-    @property
-    def BaseFileName(self) -> Union[str, List[str]]:
-        ret_val = []
-        base_list = [clip.BaseFileName for clip in self.ReplacedClips]
-        for item in base_list:
-            if isinstance(item, str):
-                ret_val.append(item)
-            elif isinstance(item, list):
-                ret_val += item
-        return ret_val
-
-    @property
-    def FramesTakenAfter(self) -> int:
-        return self._framesAfter
-    @property
-    def FramesTakenBefore(self) -> int:
-        return self._framesBefore
-    @property
-    def PluginIndex(self) -> Optional[int]:
-        return self._other_elements.get('pluginIndex')
-    @property
-    def PluginName(self) -> Optional[str]:
-        return self._other_elements.get('pluginName')
-    @property
-    def PluginType(self) -> Optional[int]:
-        return self._other_elements.get('pluginType')
-    @property
-    def ReplacedClips(self) -> List[VideoClip]:
-        return self._replaced_clips
-    @property
-    def TransitionDirection(self) -> Optional[int]:
-        return self._other_elements.get('transitionDirection')
-    @property
-    def TransitionSpeed(self) -> Optional[int]:
-        return self._other_elements.get('transitionSpeed')
-
-
-class VFXClip(VideoClip):
-    """Subclass of VideoClip for tracking clips that had filters applied"""
-    def __init__(self, clip_dict):
-        required = {"duration","file","name","in","out","startFrame","track","framesTakenAfter","framesTakenBefore"}
-        if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"VideoClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
-        super().__init__(clip_dict)
-        self._framesBefore = clip_dict['framesTakenBefore']
-        self._framesAfter  = clip_dict['framesTakenAfter']
-        self._startFrame   = clip_dict['startFrame']
-
-        self._filtered_clips = [VideoClip(clip) for clip in clip_dict.get('filteredClips', [])]
-
-    @property
-    def IsFiltered(self) -> bool:
-        return False
-
-    @property
-    def ClipEatenByFilter(self) -> Optional[bool]:
-        return self._other_elements.get('clipEatenByFilter')
-    @property
-    def FilterFadeInFrames(self) -> Optional[int]:
-        return self._other_elements.get('filterFadeinFrames')
-    @property
-    def FilterFadeOutFrames(self) -> Optional[int]:
-        return self._other_elements.get('filterFadeoutFrames')
-    @property
-    def FilterSliderValues(self) -> Optional[List[float]]:
-        return self._other_elements.get('filterSliderValues')
-    @property
-    def FilteredClips(self) -> list:
-        return self._filtered_clips
-    @property
-    def FramesTakenAfter(self) -> int:
-        return self._framesAfter
-    @property
-    def FramesTakenBefore(self) -> int:
-        return self._framesBefore
-    @property
-    def PluginIndex(self) -> Optional[int]:
-        return self._other_elements.get('pluginIndex')
-    @property
-    def PluginName(self) -> Optional[str]:
-        return self._other_elements.get('pluginName')
-    @property
-    def PluginType(self) -> Optional[int]:
-        return self._other_elements.get('pluginType')
-    @property
-    def SolidColorClipColor(self) -> Optional[List[int]]:
-        return self._other_elements.get('solidColorClipColor')
-
 class iMovieProj:
     """Class to handle structure of an iMovieHD project
     """
@@ -353,6 +68,16 @@ class iMovieProj:
         self._audioTrashClips = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips", [])]
         self._videoClips      = [VideoClip(vclip) for vclip in xmldict.get("videoClips", [])]
         self._videoTrashClips = [VideoClip(vclip) for vclip in xmldict.get("videoClips", [])]
+
+    def __repr__(self) -> str:
+        return f"iMovieProj object: {len(self.VideoClips)} video clips; {len(self.AudioClips)} audio clips; {self.VideoStandard} format"
+
+    @staticmethod
+    def _genVideoClip(vclip) -> VideoClip:
+        if vclip.get('clipEatenByFilter', False):
+            return VFXClip(vclip)
+        else:
+            return VideoClip(vclip)
 
     @property
     def AudioClips(self):
