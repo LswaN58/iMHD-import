@@ -1,11 +1,10 @@
 # builtin imports
 from typing import Any, Dict, List, Optional, Set, Union
 
+map = Dict[str, Any]
 class VideoClip:
     """Tracking of video clip properties"""
-    def __init__(self, clip_dict, sub_required:Set[str]):
-        if not clip_dict.get('class') == "video":
-            raise ValueError(f"VideoClip constructor was given a dict of class {clip_dict.get('class')}!")
+    def __init__(self, clip_dict:map, sub_required:Set[str]):
         required = sub_required.union({"duration","file","name","in","out","track"})
         if not set(clip_dict.keys()).issuperset(required):
             raise ValueError(f"VideoClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
@@ -19,7 +18,7 @@ class VideoClip:
         self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
 
     def __repr__(self):
-        return f"VideoClip object: name {self.Name}; file {self.FileName}; start {self.InFrame}; end {self.OutFrame}"
+        return f"<VideoClip object: name {self.Name}; file {self.FileName}; start {self.InFrame}; end {self.OutFrame}>"
     def __str__(self):
         return self.__repr__()
 
@@ -97,14 +96,14 @@ class VideoClip:
 
 class FilteredClip(VideoClip):
     """Class for all the things not in VideoClip, but common to VFX and Transitions."""
-    def __init__(self, clip_dict, sub_required:Set[str]):
+    def __init__(self, clip_dict:map, sub_required:Set[str]):
         required = sub_required.union({"framesTakenAfter","framesTakenBefore"})
         super().__init__(clip_dict, sub_required=required)
         self._framesBefore = clip_dict['framesTakenBefore']
         self._framesAfter  = clip_dict['framesTakenAfter']
 
     def __repr__(self):
-        return f"FilteredClip object: Subclass of {super(FilteredClip, self).__repr__()}; Plugin {self.PluginName}"
+        return f"<FilteredClip object: Subclass of {super(FilteredClip, self).__repr__()}; Plugin {self.PluginName}>"
 
     @property
     def IsFiltered(self) -> bool:
@@ -130,13 +129,13 @@ class FilteredClip(VideoClip):
 
 class Transition(FilteredClip):
     """Subclass of VideoClip to handle info about Transitions"""
-    def __init__(self, clip_dict):
+    def __init__(self, clip_dict:map):
         required = {"replacedClips"}
         super().__init__(clip_dict, sub_required=required)
         self._replaced_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('replacedClips', [])]
 
     def __repr__(self):
-        return f"Transition object: subclass of {super(Transition, self).__repr__()}; {len(self.ReplacedClips)} replaced clip(s); Base file(s) of {self.BaseFileName}"
+        return f"<Transition object: subclass of {super(Transition, self).__repr__()}; {len(self.ReplacedClips)} replaced clip(s); Base file(s) of {self.BaseFileName}>"
 
     @property
     def BaseFileName(self) -> Union[str, List[str]]:
@@ -161,14 +160,14 @@ class Transition(FilteredClip):
 
 class VFXClip(FilteredClip):
     """Subclass of VideoClip for tracking clips that had filters applied"""
-    def __init__(self, clip_dict):
+    def __init__(self, clip_dict:map):
         super().__init__(clip_dict, sub_required={"startFrame"})
         self._startFrame   = clip_dict['startFrame']
 
         self._filtered_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('filteredClips', [])]
 
     def __repr__(self) -> str:
-        return f"VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}"
+        return f"<VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}>"
 
     @property
     def FilterDepth(self) -> int:
