@@ -1,17 +1,32 @@
 from typing import Any, Dict, List, Optional, Set, Union
 from VideoClip import VideoClip
+from NestedVideoClip import NestedVideoClipFactory
 
-map = Dict[str, Any]
+Map = Dict[str, Any]
 
-class VideoFileClip(VideoClip):
+class TopVideoClip(VideoClip):
     """Class for clips that come from a video file."""
-    def __init__(self, clip_dict:map, sub_required:Set[str]):
+    def __init__(self, clip_dict:Map, sub_required:Set[str]):
+        required = sub_required.union({"track"})
+        super().__init__(clip_dict, sub_required=required)
+        self._track  = clip_dict['track']
+
+    def __repr__(self):
+        return f"<TopVideoClip object: Subclass of {super(TopVideoClip, self).__repr__()}>"
+
+    @property
+    def Track(self) -> str:
+        return self._track
+
+class TopVideoFileClip(TopVideoClip):
+    """Class for clips that come from a video file."""
+    def __init__(self, clip_dict:Map, sub_required:Set[str]):
         required = sub_required.union({"file"})
         super().__init__(clip_dict, sub_required=required)
         self._fileName  = clip_dict['file']
 
     def __repr__(self):
-        return f"<VideoFileClip object: Subclass of {super(VideoFileClip, self).__repr__()}; File {self.FileName}>"
+        return f"<VideoFileClip object: Subclass of {super(TopVideoFileClip, self).__repr__()}; File {self.FileName}>"
 
     @property
     def BaseFileName(self) -> Union[str, List[str]]:
@@ -21,16 +36,16 @@ class VideoFileClip(VideoClip):
     def FileName(self) -> str:
         return self._fileName
 
-class FilteredClip(VideoFileClip):
+class TopFilteredClip(TopVideoFileClip):
     """Class for all the things not in VideoClip, but common to VFX and Transitions."""
-    def __init__(self, clip_dict:map, sub_required:Set[str]):
+    def __init__(self, clip_dict:Map, sub_required:Set[str]):
         required = sub_required.union({"framesTakenAfter","framesTakenBefore"})
         super().__init__(clip_dict, sub_required=required)
         self._framesBefore = clip_dict['framesTakenBefore']
         self._framesAfter  = clip_dict['framesTakenAfter']
 
     def __repr__(self):
-        return f"<FilteredClip object: Subclass of {super(FilteredClip, self).__repr__()}; Plugin {self.PluginName}>"
+        return f"<FilteredClip object: Subclass of {super(TopFilteredClip, self).__repr__()}; Plugin {self.PluginName}>"
 
     @property
     def IsFiltered(self) -> bool:
@@ -54,15 +69,15 @@ class FilteredClip(VideoFileClip):
         return self._other_elements.get('pluginType')
     #endregion
 
-class Transition(FilteredClip):
+class TopTransition(TopFilteredClip):
     """Subclass of VideoClip to handle info about Transitions"""
-    def __init__(self, clip_dict:map):
+    def __init__(self, clip_dict:Map):
         required = {"replacedClips"}
         super().__init__(clip_dict, sub_required=required)
-        self._replaced_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('replacedClips', [])]
+        self._replaced_clips = [NestedVideoClipFactory.FromDict(clip) for clip in clip_dict.get('replacedClips', [])]
 
     def __repr__(self):
-        return f"<Transition object: subclass of {super(Transition, self).__repr__()}; {len(self.ReplacedClips)} replaced clip(s); Base file(s) of {self.BaseFileName}>"
+        return f"<Transition object: subclass of {super(TopTransition, self).__repr__()}; {len(self.ReplacedClips)} replaced clip(s); Base file(s) of {self.BaseFileName}>"
 
     @property
     def BaseFileName(self) -> Union[str, List[str]]:
@@ -85,16 +100,16 @@ class Transition(FilteredClip):
     def TransitionSpeed(self) -> Optional[int]:
         return self._other_elements.get('transitionSpeed')
 
-class VFXClip(FilteredClip):
+class TopVFXClip(TopFilteredClip):
     """Subclass of VideoClip for tracking clips that had filters applied"""
-    def __init__(self, clip_dict:map):
+    def __init__(self, clip_dict:Map):
         super().__init__(clip_dict, sub_required={"startFrame"})
         self._startFrame   = clip_dict['startFrame']
 
-        self._filtered_clips = [VideoClipFactory.FromDict(clip) for clip in clip_dict.get('filteredClips', [])]
+        self._filtered_clips = [NestedVideoClipFactory.FromDict(clip) for clip in clip_dict.get('filteredClips', [])]
 
     def __repr__(self) -> str:
-        return f"<VFXClip object: Subclass of {super(VFXClip, self).__repr__()}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}>"
+        return f"<VFXClip object: Subclass of {super(TopVFXClip, self).__repr__()}; {len(self.FilteredClips)} filtered clip(s); Base file {self.BaseFileName}>"
 
     @property
     def FilterDepth(self) -> int:
@@ -124,10 +139,10 @@ class VFXClip(FilteredClip):
 
 class TopVideoClipFactory:
     @staticmethod
-    def FromDict(clip_dict) -> VideoClip:
+    def FromDict(clip_dict) -> TopVideoClip:
         if clip_dict.get('class') == "transition":
-            return Transition(clip_dict=clip_dict)
+            return TopTransition(clip_dict=clip_dict)
         elif clip_dict.get('clipEatenByFilter') is True:
-            return VFXClip(clip_dict=clip_dict)
+            return TopVFXClip(clip_dict=clip_dict)
         else:
-            return VideoClip(clip_dict=clip_dict, sub_required=set())
+            return TopVideoClip(clip_dict=clip_dict, sub_required=set())
