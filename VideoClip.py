@@ -5,15 +5,18 @@ map = Dict[str, Any]
 class VideoClip:
     """Tracking of video clip properties"""
     def __init__(self, clip_dict:map, sub_required:Set[str]):
-        required = sub_required.union({"duration","file","name","in","out","track"})
-        if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"VideoClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
-        self._duration     = clip_dict['duration']
-        self._fileName     = clip_dict['file']
-        self._name         = clip_dict['name']
-        self._inFrame      = clip_dict['in']
-        self._outFrame     = clip_dict['out']
-        self._track        = clip_dict['track']
+        required = sub_required.union({"duration","file","name","in","out","uniqueID"})
+        available = set(clip_dict.keys())
+        if not available.issuperset(required):
+            vals_found = {key:clip_dict[key] for key in available.intersection(required)}
+            msg = f"VideoClip is missing required elements {required.difference(available)}!\n   Found required elements {vals_found}\n   Entire dict is {clip_dict}"
+            raise ValueError(msg)
+        self._duration  = clip_dict['duration']
+        self._fileName  = clip_dict['file']
+        self._name      = clip_dict['name']
+        self._inFrame   = clip_dict['in']
+        self._outFrame  = clip_dict['out']
+        self._unique_id = clip_dict['uniqueID']
 
         self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
 
@@ -35,9 +38,9 @@ class VideoClip:
     @property
     def InEdit(self):
         """Method to check if the current clip is part of the edit."""
-        if self._track == 0:
+        if self.Track is None or self.Track == 0:
             return False
-        elif self._track == 1:
+        elif self.Track == 1:
             return True
         else:
             return False
@@ -78,14 +81,14 @@ class VideoClip:
     def TimeScale(self) -> Optional[int]:
         return self._other_elements.get('timeScale')
     @property
-    def Track(self) -> int:
-        return self._track
+    def Track(self) -> Optional[int]:
+        return self._other_elements.get('track')
     @property
     def Type(self) -> Optional[int]:
         return self._other_elements.get('type')
     @property
     def UniqueID(self) -> Optional[bool]:
-        return self._other_elements.get('uniqueID')
+        return self._unique_id
     @property
     def Version(self) -> Optional[str]:
         return self._other_elements.get('version')
