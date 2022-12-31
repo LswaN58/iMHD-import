@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from xml.etree.ElementTree import ElementTree, Element
 # local imports
 from AudioClip import AudioClip
-from VideoClip import VideoClip, VideoClipFactory
+from TopVideoClip import TopVideoClip, TopVideoClipFactory
 
 class XMLDict:
     """
@@ -66,8 +66,8 @@ class iMovieProj:
         self._other_elements  : Dict[str, Any]  = {key:xmldict[key] for key in xmldict.keys() if key not in nested_keys}
         self._audioClips      : List[AudioClip] = [AudioClip(aclip) for aclip in xmldict.get("audioClips", [])]
         self._audioTrashClips : List[AudioClip] = [AudioClip(aclip) for aclip in xmldict.get("audioTrashClips", [])]
-        self._videoClips      : List[VideoClip] = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
-        self._videoTrashClips : List[VideoClip] = [VideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._videoClips      : List[TopVideoClip] = [TopVideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
+        self._videoTrashClips : List[TopVideoClip] = [TopVideoClipFactory.FromDict(vclip) for vclip in xmldict.get("videoClips", [])]
 
     def __repr__(self) -> str:
         return f"iMovieProj object: {len(self.VideoClips)} video clips; {len(self.AudioClips)} audio clips; {self.VideoStandard} format"
@@ -103,13 +103,13 @@ class iMovieProj:
     def Version(self) -> Optional[str]:
         return self._other_elements.get("version")
     @property
-    def VideoClips(self):
+    def VideoClips(self) -> List[TopVideoClip]:
         return self._videoClips
     @property
     def VideoStandard(self) -> Optional[str]:
         return self._other_elements.get("videoStandard")
     @property
-    def VideoTrashClips(self):
+    def VideoTrashClips(self) -> List[TopVideoClip]:
         return self._videoTrashClips
     @property
     def WritingApplicationName(self) -> Optional[str]:
