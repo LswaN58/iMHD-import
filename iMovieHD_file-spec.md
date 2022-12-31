@@ -50,8 +50,8 @@ General formatting hierarchy is as follows:
     - shelfY : int
     - thumb : int
     - timeScale : int
-    - track : int
-    - type : int
+    - track : int, but not included in filteredClips nested definitions
+    - type : int, representing an enum(1=video_file, 2=transition, 5=generated_blank_screen)
     - uniqueID : int
     - version : string
   - video example with VFX:
@@ -78,7 +78,7 @@ General formatting hierarchy is as follows:
     - solidColorClipColor : [int, int, int]
     - thumb : int
     - timeScale : int
-    - track : int
+    - track : int, but not included in filteredClips nested definitions
     - type : int
     - uniqueID : int
     - version : string
