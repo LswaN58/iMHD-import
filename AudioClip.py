@@ -31,11 +31,16 @@ class AudioPushPin:
 class AudioClip:
     """Tracking of audio clip properties"""
     def __init__(self, clip_dict:Dict[str, Any]):
+        # Check if class is ok
         if not clip_dict.get('class') == "audio":
             raise ValueError(f"AudioClip constructor was given a dict of class {clip_dict.get('class')}!")
+        # Check if clip got all necessary elements
         required = {"duration","file","name","in","out","startFrame","track","trimmedEndFrame","trimmedStartFrame"}
+        available = set(clip_dict.keys())
         if not set(clip_dict.keys()).issuperset(required):
-            raise ValueError(f"AudioClip is missing required elements {required.difference(set(clip_dict.keys()))}!")
+            vals_found = {key:clip_dict[key] for key in available.intersection(required)}
+            msg = f"AudioClip is missing required elements {required.difference(available)}!\n   Found required elements {vals_found}"
+            raise ValueError(msg)
         self._duration     = clip_dict['duration']
         self._fileName     = clip_dict['file']
         self._name         = clip_dict['name']
