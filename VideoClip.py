@@ -12,7 +12,6 @@ class VideoClip:
             msg = f"VideoClip is missing required elements {required.difference(available)}!\n   Found required elements {vals_found}\n   Entire dict is {clip_dict}"
             raise ValueError(msg)
         self._duration  = clip_dict['duration']
-        self._fileName  = clip_dict['file']
         self._name      = clip_dict['name']
         self._inFrame   = clip_dict['in']
         self._outFrame  = clip_dict['out']
@@ -21,7 +20,7 @@ class VideoClip:
         self._other_elements = {clip:clip_dict[clip] for clip in clip_dict.keys() if clip not in required}
 
     def __repr__(self):
-        return f"<VideoClip object: name {self.Name}; file {self.FileName}; start {self.InFrame}; end {self.OutFrame}>"
+        return f"<VideoClip object: name {self.Name}; start {self.InFrame}; end {self.OutFrame}>"
     def __str__(self):
         return self.__repr__()
 
@@ -33,14 +32,11 @@ class VideoClip:
     def FilterDepth(self) -> int:
         return 0
     @property
-    def BaseFileName(self) -> Union[str, List[str]]:
-        return self.FileName
-    @property
     def InEdit(self):
         """Method to check if the current clip is part of the edit."""
         if self.Track is None or self.Track == 0:
             return False
-        elif self.Track == 1:
+        elif self.Track >= 1:
             return True
         else:
             return False
@@ -50,9 +46,6 @@ class VideoClip:
     @property
     def Duration(self) -> int:
         return self._duration
-    @property
-    def FileName(self) -> str:
-        return self._fileName
     @property
     def InFrame(self) -> int:
         return self._inFrame
@@ -96,6 +89,24 @@ class VideoClip:
     def Volume(self) -> float:
         return self._other_elements.get('volume', 1.0)
     #endregion
+
+class VideoFileClip(VideoClip):
+    """Class for clips that come from a video file."""
+    def __init__(self, clip_dict:map, sub_required:Set[str]):
+        required = sub_required.union({"file"})
+        super().__init__(clip_dict, sub_required=required)
+        self._fileName  = clip_dict['file']
+
+    def __repr__(self):
+        return f"<VideoFileClip object: Subclass of {super(VideoFileClip, self).__repr__()}; File {self.FileName}>"
+
+    @property
+    def BaseFileName(self) -> Union[str, List[str]]:
+        return self.FileName
+
+    @property
+    def FileName(self) -> str:
+        return self._fileName
 
 class FilteredClip(VideoClip):
     """Class for all the things not in VideoClip, but common to VFX and Transitions."""
