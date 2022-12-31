@@ -31,7 +31,10 @@ class XMLDict:
             return [XMLDict._parse(elem) for elem in xmlvalue]
         else:
             if xmlvalue.text is None:
-                raise ValueError(f"Expected XML Element with tag {xmlvalue.tag} to have a value, but found a value of None!")
+                if xmlvalue.tag == "string":
+                    return str(xmlvalue.text)
+                else:
+                    raise ValueError(f"Expected XML Element with tag {xmlvalue.tag} to have a value, but found a value of None!")
             elif xmlvalue.tag == "string":
                 return str(xmlvalue.text)
             elif xmlvalue.tag == "integer":
