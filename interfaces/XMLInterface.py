@@ -1,11 +1,8 @@
 # builtin imports
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 from xml.etree.ElementTree import ElementTree, Element
 from xml.etree import ElementTree as ET
-# local imports
-from AudioClip import AudioClip
-from TopVideoClip import TopVideoClip, TopVideoClipFactory
 
 class XMLDict:
     """
