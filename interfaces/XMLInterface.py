@@ -12,7 +12,7 @@ class XMLDict:
     @staticmethod
     def LoadXMLDict(file:Path) -> Dict[str, Any]:
         xmltree : ElementTree = ElementTree()
-        with open(file, "r") as xmlfile:
+        with open(file, "r", encoding='UTF-8') as xmlfile:
             xmltree = ET.parse(xmlfile)
         root = xmltree.getroot()
         if len(root) > 1:
