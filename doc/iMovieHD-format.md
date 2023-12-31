@@ -68,23 +68,49 @@ The array elements are `dict`s, each with a complex bunch of sub-elements.
 
 Full descriptions of the elements are in the `iMovieHD_file-spec`, but a summary description of the broad categories is here.
 
-### Standard Elements
+### Standard Elements - Audio
 
-#### Identifier Elements
+#### Identifier Elements - Audio
+
+These elements identify the given audio clip and its source.
+Note there are `file` and `name` elements.
+The `file` element is the name of the file used in the editor, which is always an imported file, or a rendered file, not the original source that was imported.
+The `name` is usually just the same string as `file`, but without a file extension.
+However, this can vary a bit.  
+
+> Example : If a clip has been split, each part will have the same `file` name, say `"aud.aiff"`.
+> However, they will have suffixes indicating which part of the split they were, say `"aud/1"` and `"aud/2"`.
+
+> Example : If a clip was created by rendering an effect, the `file` name may be, say `"Effect 01.aif"`.
+> The `name` element, however, may be named for the effect alone, say `Effect`
 
 - `class`
     Always "audio"
 - `file`
 - `name`
-    This is usually just the same string as `file`, but without a file extension.
-    Could be a different name if the clip has an effect applied, in which case a new clip is rendered with the clip and a new name based on effect type.
+- `uniqueID`
+- `version`
+    I'm not really sure what this version refers to, although in the test files I've reviewed, this is always `4`, similar to how the file metadata `version` is always `4.1`.
+    Thus, this probably is just the major version of the spec, or whatever the file's `version` refers to.
 
-#### Timing Elements
+#### Edit State Elements - Audio
+
+These elements define the edit for an individual audio clip.
+To the best of my knowledge, the `in` and `out` refer to when the clip begins and ends *within the source file*.
+The `duration` appears to be the length of the source file, and `startFrame` is presumably the frame of the overall edit at which the audio clip is placed.
+I am not certain about the `trimmedStartFrame` and `trimmedEndFrame`; in the simple example files I've worked with, these appear redundant with `in` and `out`
+
+> Example : Assume a source for the audio clip called `aud.aiff`.
+> Assume the clip element has `in = 25`, `out = 40`, `duration = 100`, `startFrame = 10`.
+> Then the audio clip begins in the 10th frame of the edit, with a duration within the edit of 15 frames.
+> Those frames are the 25th through 40th frames of the `aud.aiff` file.
 
 - `duration`
 - `in`
 - `out`
 - `startFrame`
+- `trimmedEndFrame`
+- `trimmedStartFrame`
 - `timeScale`
     This is the FPS of the clip, which I believe is defined by the project.  
     Note that it *is* an integer, so a 29.97 would have value of 2997.
@@ -102,16 +128,44 @@ Full descriptions of the elements are in the `iMovieHD_file-spec`, but a summary
 #### Editor State Elements - Audio
 
 - `isSelected`
+- `track`
+    This appears to just be the audio channel of the editor where the clip sits.
 
-#### Unknown Elements
+#### Unknown Elements - Audio
+
+I think `imae` is related to the effects/plugins engine, but don't really know what these elements are for.
 
 - `imae4cc`
 - `imaeVersion`
 - `imaeFilteredList`
 
-### Recursive Elements
+### Recursive Elements - Audio
 
 
 ## <a name="videoclips">Video Clips</a>
+
+### Standard Elements - Video
+
+#### Identifier Elements - Video
+
+These elements identify the given audio clip and its source.
+Note there are `file` and `name` elements.
+The `file` element is the name of the file used in the editor, which is always an imported file, or a rendered file, not the original source that was imported.
+The `name` is usually just the same string as `file`, but without a file extension.
+However, this can vary a bit.  
+
+> Example : If a clip has been split, each part will have the same `file` name, say `"vid.mov"`.
+> However, they will have suffixes indicating which part of the split they were, say `"vid/1"` and `"vid/2"`.
+
+#### Timing Elements - Video
+
+
+#### Editor State Elements - Video
+
+
+#### Unknown Elements - Video
+
+
+### Recursive Elements - Video
 
 ## Effect Clips
